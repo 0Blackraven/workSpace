@@ -19,11 +19,15 @@ import {
 } from "../components/ui/card";
 
 export default function Login(){
-    const [userName, setUserName] = useState<string>("");
+    const [usernameOrEmail, setUsernameOrEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const [confirmation, setConfirmation] = useState<string>("");
+    const [usernameOrEmailError, setUsernameOrEmailError] = useState<boolean>(true);
 
-    const matchStatus = password != " " && password === confirmation 
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const usernameRegex = /^[a-zA-Z0-9]+$/;
+    const matchPasswordStatus = password != " " && password === confirmation;
+    const matchUsernameOrEmailStatus = emailRegex.test(usernameOrEmail) || usernameRegex.test(usernameOrEmail);
 
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setPassword(e.target.value);
@@ -32,22 +36,33 @@ export default function Login(){
         setConfirmation(e.target.value);
     }
     const handleUserNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setUserName(e.target.value);
+        setUsernameOrEmail(e.target.value);
     }
     
-    const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>, mode: string) =>{
+    const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>, mode: string, matchUsernameOrEmailStatus:boolean) =>{
+        if(!matchUsernameOrEmailStatus){
+            setUsernameOrEmailError(false);
+            return;
+        }
+        setUsernameOrEmailError(true);
         try{
             e.preventDefault();
             const res = await axios.post("http://localhost:8080/signin",
                 {
-                    username: userName,
+                    usernameOrEmail: usernameOrEmail,
                     password: password,
                     mode: mode
                 },
-            );
+            );  
             alert(res.data.message)
         }catch(err: any){
-            console.error(err.res?.data.error || "something went wrong i dont know what but something went wrong");
+             if (err.response && err.response.data) {
+            // Show the backend's error message
+            alert(err.response.data.error || "An error occurred");
+        } else {
+            console.error(err);
+            alert("something went wrong i dont know what but something went wrong");
+    }
         }
     }
 
@@ -55,8 +70,8 @@ export default function Login(){
         <div className="flex h-screen w-screen items-center justify-center">
             <Tabs defaultValue="Login" className="w-[400px]" >
             <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="Login">LOGIN</TabsTrigger>
-                <TabsTrigger value="SignUp">SIGNUP</TabsTrigger>
+                <TabsTrigger value="Login" onClick={()=>{setUsernameOrEmailError(true)}}>LOGIN</TabsTrigger>
+                <TabsTrigger value="SignUp" onClick={()=>{setUsernameOrEmailError(true)}}>SIGNUP</TabsTrigger>
             </TabsList >
             <TabsContent value="Login">
                 
@@ -76,9 +91,10 @@ export default function Login(){
                     <Label htmlFor="password">Password</Label>
                     <Input id="password" placeholder="Qwerty123@" onChange={handlePasswordChange}/>
                     </div>
+                    {!usernameOrEmailError && <div className="text-red-500 flex justify-center">Username or Email is not valid</div>}
                 </CardContent>
                 <CardFooter>
-                    <Button onClick={(e)=>handleSubmit(e, "login")}>Submit</Button>
+                    <Button onClick={(e)=>handleSubmit(e, "login", matchUsernameOrEmailStatus)}>Submit</Button>
                 </CardFooter>
                 </Card>
             </TabsContent>
@@ -103,10 +119,11 @@ export default function Login(){
                     <Label htmlFor="confirmation">Confirm Password</Label>
                     <Input id="confirmation" type="password" onChange={handleConfirmationChange}/>
                     </div>
-                    {!matchStatus && <div>Password and Confirm Password do not match</div>}
+                    {!matchPasswordStatus && <div className="text-red-500 flex justify-center">Password and Confirm Password do not match</div>}
+                    {!usernameOrEmailError && <div className="text-red-500 flex justify-center">Username or Email is not valid</div>}
                 </CardContent>
                 <CardFooter>
-                    <Button disabled={!matchStatus} onClick={(e)=>handleSubmit(e, "signup")}>
+                    <Button disabled={(!matchPasswordStatus && !matchUsernameOrEmailStatus)} onClick={(e)=>handleSubmit(e, "signup", matchUsernameOrEmailStatus)}>
                         Start
                     </Button>
                 </CardFooter>
