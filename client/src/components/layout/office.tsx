@@ -4,8 +4,11 @@ export class OfficeLayout {
   roomWidth = 1280;
   roomHeight = 960;
   staticObjects!: Phaser.Physics.Arcade.StaticGroup;
+  scene: Phaser.Scene
 
-  constructor(private scene: Phaser.Scene) {}
+  constructor(scene: Phaser.Scene) {
+    this.scene = scene
+  }
 
   preload() {
     const assets = [
@@ -21,10 +24,10 @@ export class OfficeLayout {
       'Water-Dispenser', 'Wide-Filing-Cabinet'
     ];
     
-    this.scene.load.image('Tileset', '/assets/0-Tileset.png');
+    this.scene.load.image('Tileset', '/office/0-Tileset.png');
     assets.forEach(asset => {
         if (asset !== '0-Tileset') {
-            this.scene.load.image(asset, `/assets/${asset}.png`);
+            this.scene.load.image(asset, `/office/${asset}.png`);
         }
     });
 

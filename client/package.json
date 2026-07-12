@@ -13,10 +13,11 @@
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
-    "@phosphor-icons/react": "^2.1.10",
     "@tailwindcss/vite": "^4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "lucide-react": "^1.24.0",
+    "motion": "^12.42.2",
     "phaser": "^4.2.1",
     "radix-ui": "^1.6.2",
     "react": "^19.2.6",

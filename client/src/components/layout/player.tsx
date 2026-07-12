@@ -5,8 +5,11 @@ export class Player {
   cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   wasd!: { up: Phaser.Input.Keyboard.Key; down: Phaser.Input.Keyboard.Key; left: Phaser.Input.Keyboard.Key; right: Phaser.Input.Keyboard.Key; };
   speed = 250;
+  scene: Phaser.Scene
 
-  constructor(private scene: Phaser.Scene) {}
+  constructor(scene: Phaser.Scene) {
+    this.scene = scene
+  }
 
   preload() {
     this.scene.load.spritesheet('playerDown', 'https://raw.githubusercontent.com/chriscourses/pokemon-style-game/main/img/playerDown.png', { frameWidth: 48, frameHeight: 68 });

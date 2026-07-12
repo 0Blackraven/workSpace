@@ -1,7 +1,5 @@
 import { useState } from 'react'
 import {useNavigate} from 'react-router-dom'
-import { Input } from '../ui/input'
-import { Button } from '../ui/button'
 
 const Landing = () => {
 
@@ -23,12 +21,12 @@ const Landing = () => {
         <div className='h-screen w-screen flex items-center jsutify-center'>
             <div className='flex flex-col gap-2 p-3'>
                 <div className="">
-                    <Input onChange={(e) => {setRoomId(e.target.value)}} placeholder='Enter your Room Id'/>
-                    <Input onChange={(e) => {setName(e.target.value)}} placeholder='Enter username'/>
+                    <input onChange={(e) => {setRoomId(e.target.value)}} placeholder='Enter your Room Id'/>
+                    <input onChange={(e) => {setName(e.target.value)}} placeholder='Enter username'/>
                 </div>
-                <Button className='' variant={"outline"} onClick={handleRoomJoin}>
+                <button className='' onClick={handleRoomJoin}>
                     <span className="capitalize">join room</span>
-                </Button>
+                </button>
             </div>
         </div>
     )

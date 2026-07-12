@@ -41,7 +41,7 @@ const WorkElement = () => {
 
   return (
     <div 
-      className="w-full h-full m-0 p-0 overflow-hidden bg-gray-900 relative"
+      className="w-full h-full m-0 p-0 overflow-hidden bg-gray-900 relative z-0"
       onClick={() => {
         setIsFocused(true);
       }}
