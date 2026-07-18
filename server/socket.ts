@@ -8,7 +8,8 @@ export const initSocketServer = (server: HTTPServer) => {
     });
 
     io.on("connection", (socket: Socket) => {
-        const { roomCode, username } = socket.handshake.auth;
+        const roomCode = socket.handshake.query.roomCode as string;
+        const username = socket.handshake.query.username as string;
 
         if (!roomCode || !username) {
             console.log("Connection rejected: Missing query parameters.");

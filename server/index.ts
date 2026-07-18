@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import type { Request, Response } from "express";
 import { createServer } from "http";
+import cors from "cors";
 import { initSocketServer } from "./socket.js";
 
 dotenv.config();
@@ -20,7 +21,13 @@ export interface Room {
 
 export const activeRooms: Map<string, Room> = new Map();
 
+const corsConfig = {
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST"]
+};
+
 const app = express();
+app.use(cors(corsConfig));
 app.use(express.json());
 
 const port = process.env.PORT || "8080";
@@ -29,10 +36,26 @@ const server = createServer(app);
 
 initSocketServer(server);
 
-app.route("/joinRoom").post(handleJoinConnection);
-app.route("/createRoom").post(handleCreateConnection);
+app.route("/verifyRoom").post(handleVerifyRoom);
+app.route("/registerPlayer").post(handleRegisterPlayer);
+app.route("/createRoom").get(handleCreateConnection);
 
-function handleJoinConnection(req: Request, res: Response) {
+function handleVerifyRoom(req: Request, res: Response) {
+    const { roomCode }: { roomCode: string } = req.body;
+
+    if (!roomCode) {
+        return res.status(400).json({ error: "RoomCode not provided" });
+    }
+
+    const room = activeRooms.get(roomCode);
+    if (!room) {
+        return res.status(404).json({ error: "This room code does not exist" });
+    }
+
+    return res.status(200).json({ message: "Room valid" });
+}
+
+function handleRegisterPlayer(req: Request, res: Response) {
     const { username, roomCode }: { username: string; roomCode: string } = req.body;
 
     if (!username || !roomCode) {
@@ -41,37 +64,30 @@ function handleJoinConnection(req: Request, res: Response) {
 
     const room = activeRooms.get(roomCode);
     if (!room) {
-        return res.status(404).json({ error: "Room does not exist" });
+        return res.status(404).json({ error: "Room disappeared or timed out" });
     }
 
-    const isUsernameTaken = room.players.some((p) => p.username === username);
+    const isUsernameTaken = room.players.some((p) => p.username.toLowerCase() === username.toLowerCase());
     if (isUsernameTaken) {
-        return res.status(409).json({ error: "Username already taken" });
+        return res.status(409).json({ error: "Username is already taken inside this room" });
     }
 
     const player: Player = { username, x: 0, y: 0, socket: "" };
     room.players.push(player);
     
-    return res.status(200).json({ roomCode, username });
+    return res.status(200).json({message: "Ok Verified"});
 }
 
 function handleCreateConnection(req: Request, res: Response) {
-    const { username }: { username: string } = req.body;
-
-    if (!username) {
-        return res.status(400).json({ error: "Username not provided" });
-    }
-
     const code = createRandomRoomCode();
-    const player: Player = { username, x: 0, y: 0, socket: "" };
     
     const room: Room = {
         roomCode: code,
-        players: [player]
+        players: [] 
     };
 
     activeRooms.set(code, room);
-    return res.status(200).json({ roomCode: code, username });
+    return res.status(200).json({ roomCode: code });
 }
 
 function createRandomRoomCode() {
