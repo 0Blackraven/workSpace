@@ -6,6 +6,7 @@ import { useState } from "react";
 import NavBar from "./navBar";
 import { ChevronRightCircle } from "lucide-react";
 import axios from "axios";
+import { connectSocket } from "@/socket";
 
 const MainPage = () =>{
 
@@ -43,6 +44,9 @@ const LoadingComponent = ({setStartUp}: {setStartUp: React.Dispatch<React.SetSta
             await api.post("/registerPlayer", {username: name, roomCode: code});
             sessionStorage.setItem("username", name || "");
             setStartUp(false);
+            if(code && name){
+                connectSocket(name, code);
+            }
         }catch(e){
             console.log(e);
         }

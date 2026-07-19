@@ -1,3 +1,4 @@
+import { socket } from '@/socket';
 import Phaser from 'phaser';
 
 export class Player {
@@ -6,6 +7,7 @@ export class Player {
   wasd!: { up: Phaser.Input.Keyboard.Key; down: Phaser.Input.Keyboard.Key; left: Phaser.Input.Keyboard.Key; right: Phaser.Input.Keyboard.Key; };
   speed = 250;
   scene: Phaser.Scene
+  lastEmittedPosition = { x: 0, y: 0, anim: "", isMoving: false };
 
   constructor(scene: Phaser.Scene) {
     this.scene = scene
@@ -24,6 +26,8 @@ export class Player {
     this.sprite.setCollideWorldBounds(true);
     this.sprite.body?.setSize(32, 24);
     this.sprite.body?.setOffset(8, 44);
+
+    socket.emit('player-movement', { x, y, anim: 'down', isMoving: false });
 
     this.scene.anims.create({
       key: 'left',
@@ -102,6 +106,21 @@ export class Player {
       if (this.sprite.anims.currentAnim?.key === 'up') this.sprite.setTexture('playerUp', 0);
       if (this.sprite.anims.currentAnim?.key === 'down') this.sprite.setTexture('playerDown', 0);
       this.sprite.anims.stop();
+    }
+
+    // movement socket emision
+    const currentAnim = this.sprite.anims.currentAnim?.key || '';
+    const x = Math.round(this.sprite.x);
+    const y = Math.round(this.sprite.y);
+
+    if (
+      isMoving !== this.lastEmittedPosition.isMoving ||
+      currentAnim !== this.lastEmittedPosition.anim ||
+      Math.abs(x - this.lastEmittedPosition.x) > 2 ||
+      Math.abs(y - this.lastEmittedPosition.y) > 2
+    ) {
+      socket.emit('player-movement', { x, y, anim: currentAnim, isMoving });
+      this.lastEmittedPosition = { x, y, anim: currentAnim, isMoving };
     }
   }
 }

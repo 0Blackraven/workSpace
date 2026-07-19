@@ -1,10 +1,21 @@
 import { io } from "socket.io-client";
-import dotenv from "dotenv";
 
-dotenv.config();
+export const socket = io("http://localhost:8080" , {
+    transports: ['websocket'],
+    autoConnect: false
+});
 
-export const socket = io(process.env.FRONTENDURL || "https://localhost:8080");
+export const connectSocket = (username: string, roomCode: string) => {
+    if (socket.connected) {
+        return;
+    }
+    socket.io.opts.query = { username, roomCode };
+    socket.connect();
+    socket.on("connect", () => {
+        console.log(socket + " joined\n ");
+    });
 
-socket.on("connect", () => {
-    
-})
+    socket.on("disconnect", (reason) => {
+        console.log("Disconnected from server:", reason);
+    })
+}
