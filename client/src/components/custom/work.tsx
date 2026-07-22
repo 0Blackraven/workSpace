@@ -87,7 +87,7 @@ class MainScene extends Phaser.Scene {
     this.physics.add.collider(this.player.sprite, this.office.staticObjects);
 
     this.player.sprite.setInteractive({ useHandCursor: true });
-    this.player.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Phaser.Types.Input.EventData) => {
+    this.player.sprite.on('pointerdown', (_pointer: Phaser.Input.Pointer, _localX: number, _localY: number, event: Phaser.Types.Input.EventData) => {
       event.stopPropagation();
       window.dispatchEvent(new CustomEvent('toggle-bottom-bar', { detail: { show: false } }));
     });
@@ -155,7 +155,7 @@ class MainScene extends Phaser.Scene {
       this.otherPlayers.set(data.socketId, otherPlayer);
 
       otherPlayer.setInteractive({ useHandCursor: true });
-      otherPlayer.on('pointerdown', (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Phaser.Types.Input.EventData) => {
+      otherPlayer.on('pointerdown', (_pointer: Phaser.Input.Pointer, _localX: number, _localY: number, event: Phaser.Types.Input.EventData) => {
         event.stopPropagation();
         window.dispatchEvent(new CustomEvent('toggle-bottom-bar', { detail: { show: true } }));
       });
