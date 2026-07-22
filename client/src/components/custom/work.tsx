@@ -85,6 +85,18 @@ class MainScene extends Phaser.Scene {
     this.physics.world.setBounds(0, 0, this.office.roomWidth, this.office.roomHeight);
     
     this.physics.add.collider(this.player.sprite, this.office.staticObjects);
+
+    this.player.sprite.setInteractive({ useHandCursor: true });
+    this.player.sprite.on('pointerdown', (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Phaser.Types.Input.EventData) => {
+      event.stopPropagation();
+      window.dispatchEvent(new CustomEvent('toggle-bottom-bar', { detail: { show: false } }));
+    });
+
+    // Clicking anywhere else on the scene hides the bottomBar
+    this.input.on('pointerdown', () => {
+      window.dispatchEvent(new CustomEvent('toggle-bottom-bar', { detail: { show: false } }));
+    });
+
     this.cameras.main.setBounds(0, 0, this.office.roomWidth, this.office.roomHeight);
     this.cameras.main.startFollow(this.player.sprite, true, 0.09, 0.09);
     this.cameras.main.setZoom(1.5);
@@ -115,7 +127,6 @@ class MainScene extends Phaser.Scene {
       }
     });
 
-    // Clean up socket listeners when the scene shuts down
     this.events.on('shutdown', () => {
       socket.off('initial-player-load');
       socket.off('other-player-movement');
@@ -142,6 +153,12 @@ class MainScene extends Phaser.Scene {
       
       otherPlayer.setData('nameText', nameText);
       this.otherPlayers.set(data.socketId, otherPlayer);
+
+      otherPlayer.setInteractive({ useHandCursor: true });
+      otherPlayer.on('pointerdown', (pointer: Phaser.Input.Pointer, localX: number, localY: number, event: Phaser.Types.Input.EventData) => {
+        event.stopPropagation();
+        window.dispatchEvent(new CustomEvent('toggle-bottom-bar', { detail: { show: true } }));
+      });
     }
 
     otherPlayer.setPosition(data.x, data.y);

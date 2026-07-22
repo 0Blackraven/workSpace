@@ -1,11 +1,7 @@
 import { Server, type Socket } from "socket.io";
-import { type Server as HTTPServer } from "http";
 import { activeRooms } from "./index.js";
 
-export const initSocketServer = (server: HTTPServer) => {
-    const io = new Server(server, {
-        cors: { origin: "*", methods: ["GET", "POST"] }
-    });
+export const initSocketServer = (io : Server) => {
 
     io.on("connection", (socket: Socket) => {
         const roomCode = socket.handshake.query.roomCode as string;
@@ -89,3 +85,4 @@ function handleRequests(socket: Socket, roomCode: string, username: string) {
         });
     });
 }
+

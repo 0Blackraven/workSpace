@@ -1,8 +1,8 @@
 import WorkElement from "@/components/custom/work";
-// import BottomBar from "./components/custom/bottomBar";
-// import VideoCallElement from "./components/custom/videoCall";
+import BottomBar from "./bottomBar";
+import VideoCallElement from "@/components/custom/videoCall";
 // import Notification from "./components/custom/Notification";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import NavBar from "./navBar";
 import { ChevronRightCircle } from "lucide-react";
 import axios from "axios";
@@ -11,13 +11,38 @@ import { connectSocket } from "@/socket";
 const MainPage = () =>{
 
     const [startUp, setStartUp] = useState<boolean>(true);
+    const [showBottomBar, setShowBottomBar] = useState<boolean>(false);
+    const [showCall, setShowCall] = useState<boolean>(false);
+
+    useEffect(() => {
+        const handleBottomBarToggle = (e: Event) => {
+            const customEvent = e as CustomEvent<{ show: boolean }>;
+            setShowBottomBar(customEvent.detail.show);
+        };
+        const handleCallToggle = (e: Event) => {
+            const customEvent = e as CustomEvent<{show: boolean}>;
+            setShowCall(customEvent.detail.show);
+        }
+        window.addEventListener('toggle-call', handleCallToggle);
+        window.addEventListener('toggle-bottom-bar', handleBottomBarToggle);
+        return () => {
+            window.removeEventListener('toggle-call', handleCallToggle);
+            window.removeEventListener('toggle-bottom-bar', handleBottomBarToggle);
+        };
+    }, []);
 
     return(
         <div className="h-screen w-screen overflow-hidden">
             <NavBar/>
             {startUp ?
                 <LoadingComponent setStartUp = {setStartUp}/> :
-                <WorkElement/>
+                (
+                    <>
+                        <WorkElement/> 
+                        {showCall && <VideoCallElement/>}
+                        {showBottomBar && <BottomBar />}
+                    </>
+                )
             }
             
         </div>

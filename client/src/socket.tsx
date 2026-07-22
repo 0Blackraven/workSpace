@@ -5,6 +5,10 @@ export const socket = io("http://localhost:8080" , {
     autoConnect: false
 });
 
+export const mediaSocket = io("http://localhost:8080/mediasoup", {
+    autoConnect: false
+});
+
 export const connectSocket = (username: string, roomCode: string) => {
     if (socket.connected) {
         return;

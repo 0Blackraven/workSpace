@@ -1,9 +1,11 @@
 import express from "express";
 import dotenv from "dotenv";
 import type { Request, Response } from "express";
+import {Server} from "socket.io";
 import { createServer } from "http";
 import cors from "cors";
 import { initSocketServer } from "./socket.js";
+import { handleMedia } from "./sfu.js";
 
 dotenv.config();
 
@@ -24,7 +26,7 @@ export interface Room {
 export const activeRooms: Map<string, Room> = new Map();
 
 const corsConfig = {
-    origin: "http://localhost:5173",
+    origin: "*",
     methods: ["GET", "POST"]
 };
 
@@ -36,7 +38,14 @@ const port = process.env.PORT || "8080";
 
 const server = createServer(app);
 
-initSocketServer(server);
+export const io = new Server(server, {
+    cors: { origin: "*", methods: ["GET", "POST"] }
+});
+
+const peer = io.of("/mediasoup");
+
+initSocketServer(io);
+handleMedia(peer);
 
 app.route("/verifyRoom").post(handleVerifyRoom);
 app.route("/registerPlayer").post(handleRegisterPlayer);

@@ -9,6 +9,7 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "mediasoup": "^3.21.2",
     "socket.io": "^4.8.3"
   },
   "devDependencies": {

@@ -3,9 +3,8 @@ import Phaser from 'phaser';
 
 export class Player {
   sprite!: Phaser.Physics.Arcade.Sprite;
-  cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   wasd!: { up: Phaser.Input.Keyboard.Key; down: Phaser.Input.Keyboard.Key; left: Phaser.Input.Keyboard.Key; right: Phaser.Input.Keyboard.Key; };
-  speed = 250;
+  speed = 200;
   scene: Phaser.Scene
   lastEmittedPosition = { x: 0, y: 0, anim: "", isMoving: false };
 
@@ -58,7 +57,6 @@ export class Player {
     });
 
     if (this.scene.input.keyboard) {
-      this.cursors = this.scene.input.keyboard.createCursorKeys();
       this.wasd = this.scene.input.keyboard.addKeys({
           up: Phaser.Input.Keyboard.KeyCodes.W,
           down: Phaser.Input.Keyboard.KeyCodes.S,
@@ -73,10 +71,10 @@ export class Player {
 
     this.sprite.setVelocity(0);
 
-    const isLeft = (this.cursors?.left.isDown || this.wasd?.left.isDown);
-    const isRight = (this.cursors?.right.isDown || this.wasd?.right.isDown);
-    const isUp = (this.cursors?.up.isDown || this.wasd?.up.isDown);
-    const isDown = (this.cursors?.down.isDown || this.wasd?.down.isDown);
+    const isLeft = this.wasd?.left.isDown;
+    const isRight = this.wasd?.right.isDown;
+    const isUp = this.wasd?.up.isDown;
+    const isDown = this.wasd?.down.isDown;
 
     let isMoving = false;
 
